@@ -7,34 +7,29 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { User, Mail, Phone, Send, Sparkles, Building } from "lucide-react"
-
-interface Profile {
-  id: string
-  name: string
-  profilePic: string
-  aiInsights: string[]
-  email: string
-  phone: string
-  title: string
-  company: string
-}
+import { User, Mail, Phone, Send, Sparkles, Building, MapPin, Linkedin } from "lucide-react"
+import type { Profile } from "@/lib/api"
 
 interface ProfileDisplayProps {
   profile: Profile
-  onSendMessage: (profile: Profile, message: string) => void
+  onSendMessage: (profile: Profile, message: string, email: string, phone: string) => void
 }
 
 export function ProfileDisplay({ profile, onSendMessage }: ProfileDisplayProps) {
   const [email, setEmail] = useState(profile.email)
   const [phone, setPhone] = useState(profile.phone)
   const [message, setMessage] = useState("")
+  const [isSending, setIsSending] = useState(false)
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (message.trim()) {
-      const updatedProfile = { ...profile, email, phone }
-      onSendMessage(updatedProfile, message)
-      setMessage("")
+      setIsSending(true)
+      try {
+        await onSendMessage(profile, message, email, phone)
+        setMessage("")
+      } finally {
+        setIsSending(false)
+      }
     }
   }
 
@@ -61,10 +56,24 @@ export function ProfileDisplay({ profile, onSendMessage }: ProfileDisplayProps) 
           <div className="flex-1">
             <h3 className="text-2xl font-bold text-gray-900">{profile.name}</h3>
             <p className="text-lg text-gray-600 mb-1">{profile.title}</p>
-            <div className="flex items-center gap-2 text-gray-500">
+            <div className="flex items-center gap-2 text-gray-500 mb-2">
               <Building className="h-4 w-4" />
               <span>{profile.company}</span>
             </div>
+            {profile.location && (
+              <div className="flex items-center gap-2 text-gray-500 mb-2">
+                <MapPin className="h-4 w-4" />
+                <span>{profile.location}</span>
+              </div>
+            )}
+            {profile.linkedin && (
+              <div className="flex items-center gap-2 text-blue-600">
+                <Linkedin className="h-4 w-4" />
+                <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                  LinkedIn Profile
+                </a>
+              </div>
+            )}
           </div>
         </div>
 
@@ -126,11 +135,11 @@ export function ProfileDisplay({ profile, onSendMessage }: ProfileDisplayProps) 
           />
           <Button
             onClick={handleSendMessage}
-            disabled={!message.trim()}
+            disabled={!message.trim() || isSending}
             className="mt-3 w-full bg-orange-600 hover:bg-orange-700"
           >
             <Send className="h-4 w-4 mr-2" />
-            Send Message
+            {isSending ? "Sending..." : "Send Message"}
           </Button>
         </div>
       </CardContent>
