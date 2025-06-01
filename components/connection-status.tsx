@@ -13,6 +13,11 @@ interface ConnectionStatusProps {
 export function ConnectionStatus({ apiBaseUrl }: ConnectionStatusProps) {
   const [isConnected, setIsConnected] = useState<boolean | null>(null)
   const [isChecking, setIsChecking] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const checkConnection = async () => {
     setIsChecking(true)
@@ -32,8 +37,29 @@ export function ConnectionStatus({ apiBaseUrl }: ConnectionStatusProps) {
   }
 
   useEffect(() => {
-    checkConnection()
-  }, [])
+    if (mounted) {
+      checkConnection()
+    }
+  }, [mounted])
+
+  if (!mounted) {
+    return (
+      <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <RefreshCw className="h-4 w-4 animate-spin text-gray-500" />
+              <span className="text-sm font-medium">Backend Status</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge className="bg-gray-100 text-gray-700">Initializing...</Badge>
+            </div>
+          </div>
+          <div className="mt-2 text-xs text-gray-500">API: {apiBaseUrl}</div>
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">

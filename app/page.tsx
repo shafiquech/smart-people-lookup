@@ -20,7 +20,6 @@ export default function Home() {
 
   // Load analytics on component mount
   useEffect(() => {
-    console.log("🌍 ENV in client:", process.env.NEXT_PUBLIC_API_BASE_URL);
     loadAnalytics()
   }, [])
 
@@ -107,7 +106,7 @@ export default function Home() {
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center py-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Smart People Lookup Tool1</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Smart People Lookup Tool</h1>
           <p className="text-lg text-gray-600">Find and connect with professionals instantly</p>
         </div>
 

@@ -38,6 +38,16 @@ export interface AnalyticsResponse {
   lastSearchTime?: string
 }
 
+export interface CommunicationRecord {
+  id: number
+  name: string | null
+  email: string
+  phone: string
+  message: string
+  mode: string | null
+  sentAt: string | null
+}
+
 // Add request logging for debugging
 const logRequest = (method: string, url: string, data?: any) => {
   console.log(`🔄 API ${method} ${url}`, data ? { data } : "")
@@ -120,7 +130,7 @@ export async function sendMessage(messageData: MessageRequest): Promise<MessageR
 
 // Get analytics data
 export async function getAnalytics(): Promise<AnalyticsResponse> {
-  const url = `${API_BASE_URL}/reports`
+  const url = `${API_BASE_URL}/analytics`
 
   logRequest("GET", url)
 
@@ -147,6 +157,35 @@ export async function getAnalytics(): Promise<AnalyticsResponse> {
       totalSearches: 0,
       successRate: 0,
     }
+  }
+}
+
+// Get communication records
+export async function getCommunicationStats(): Promise<CommunicationRecord[]> {
+  const url = `${API_BASE_URL}/reports`
+
+  logRequest("GET", url)
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        // Add authentication headers if needed
+        // 'Authorization': `Bearer ${getAuthToken()}`,
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    logResponse("GET", url, data)
+    return Array.isArray(data) ? data : []
+  } catch (error) {
+    logError("GET", url, error)
+    return []
   }
 }
 
