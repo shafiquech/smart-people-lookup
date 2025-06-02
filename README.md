@@ -12,8 +12,6 @@
 
 
 
-# smart-people-lookup
-smart people  loop up with n8n.
 # Build docker image
 docker build -t shafiquech/n8n-smart-profile:1.12 .
 # Push
